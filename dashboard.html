@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Luminous Ledger</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="js/store.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#10141a",
+                        "surface-variant": "#31353c",
+                        "primary": "#adc6ff",
+                        "on-surface": "#dfe2eb",
+                        "on-surface-variant": "#c1c6d7",
+                        "outline": "#8b90a0",
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #dfe2eb;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+            backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .primary-button {
+            background: linear-gradient(135deg, #4b8eff 0%, #00f4fe 100%);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .primary-button:hover {
+            box-shadow: 0 0 20px rgba(75, 142, 255, 0.4);
+            transform: scale(1.02);
+        }
+
+        .glow-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(75, 142, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(0, 244, 254, 0.05) 0%, transparent 50%);
+            filter: blur(80px);
+        }
+
+        .primary-gradient-text {
+            background: linear-gradient(to right, #adc6ff, #00f4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .transaction-row {
+            transition: background-color 0.2s;
+        }
+        .transaction-row:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body class="font-body-md">
+    <div class="glow-mesh"></div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 glass-panel border-r border-white/10 hidden md:flex flex-col h-full shrink-0">
+            <div class="p-6 flex items-center gap-3 border-b border-white/10">
+                <div class="w-8 h-8 rounded bg-primary/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-xl">account_balance</span>
+                </div>
+                <span class="font-bold text-xl tracking-tight">Luminous</span>
+            </div>
+            
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors">
+                    <span class="material-symbols-outlined">wallet</span>
+                    <span class="font-medium">Accounts</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors">
+                    <span class="material-symbols-outlined">swap_horiz</span>
+                    <span class="font-medium">Transfers</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors">
+                    <span class="material-symbols-outlined">insights</span>
+                    <span class="font-medium">Analytics</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors">
+                    <span class="material-symbols-outlined">credit_card</span>
+                    <span class="font-medium">Cards</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-white/10">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:text-on-surface transition-colors">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="font-medium">Settings</span>
+                </a>
+                <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors mt-2 text-left">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-medium">Log out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+            
+            <!-- Top Header -->
+            <header class="h-20 glass-panel border-b border-white/10 flex items-center justify-between px-6 shrink-0 z-10">
+                <div class="flex items-center gap-4">
+                    <button class="md:hidden text-on-surface-variant hover:text-on-surface">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <div>
+                        <h2 class="text-xl font-semibold" id="greetingName">Good Morning, User</h2>
+                        <p class="text-xs text-on-surface-variant" id="currentDate">Mon, Oct 24, 2026</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="relative w-10 h-10 rounded-full bg-surface-variant border border-white/10 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-[#00f4fe] p-[2px]">
+                        <div class="w-full h-full bg-surface rounded-full flex items-center justify-center">
+                            <span class="font-bold text-sm" id="userInitials">U</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Dashboard Content -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
+                
+                <!-- Top Widgets Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Total Balance Card -->
+                    <div class="lg:col-span-2 glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 group-hover:bg-primary/10 transition-colors"></div>
+                        
+                        <div class="relative z-10 flex flex-col h-full justify-between">
+                            <div class="flex justify-between items-start mb-8">
+                                <div>
+                                    <p class="text-on-surface-variant font-medium mb-1">Total Balance</p>
+                                    <h3 class="text-4xl md:text-5xl font-bold tracking-tight" id="totalBalance">$0.00</h3>
+                                </div>
+                                <div class="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">trending_up</span>
+                                    +2.4%
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="accountsContainer">
+                                <!-- Accounts injected here by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Transfer Widget -->
+                    <div class="glass-panel rounded-2xl p-6 relative">
+                        <h3 class="text-lg font-semibold mb-4">Quick Transfer</h3>
+                        <form id="transferForm" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-on-surface-variant mb-1">From Account</label>
+                                <div class="relative mb-4">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-sm">account_balance_wallet</span>
+                                    <select id="transferAccount" class="w-full bg-surface-variant/50 border border-outline/30 rounded-lg py-2.5 pl-9 pr-4 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none appearance-none">
+                                        <!-- Options injected by JS -->
+                                    </select>
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-sm pointer-events-none">expand_more</span>
+                                </div>
+                                <label class="block text-xs font-medium text-on-surface-variant mb-1">Amount</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">$</span>
+                                    <input type="number" id="transferAmount" required min="1" step="0.01" placeholder="0.00" class="w-full bg-surface-variant/50 border border-outline/30 rounded-lg py-2.5 pl-8 pr-4 text-on-surface placeholder-outline focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none font-medium">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-medium text-on-surface-variant mb-1">To</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-sm">person</span>
+                                    <input type="text" id="transferRecipient" required placeholder="Name, Email, or Account" class="w-full bg-surface-variant/50 border border-outline/30 rounded-lg py-2.5 pl-9 pr-4 text-sm text-on-surface placeholder-outline focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none">
+                                </div>
+                            </div>
+
+                            <div id="transferFeedback" class="hidden text-sm py-2 px-3 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 text-center">
+                                Transfer successful!
+                            </div>
+
+                            <button type="submit" class="w-full primary-button text-[#002021] font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 mt-2">
+                                Send Money
+                                <span class="material-symbols-outlined text-sm">send</span>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="glass-panel rounded-2xl overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold">Recent Transactions</h3>
+                        <div class="flex gap-2" id="transactionFilters">
+                            <button data-filter="all" class="filter-btn active px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30 transition-colors">All</button>
+                            <button data-filter="credit" class="filter-btn px-3 py-1 rounded-full text-xs font-medium bg-surface-variant/50 text-on-surface-variant hover:text-on-surface border border-transparent transition-colors">Income</button>
+                            <button data-filter="debit" class="filter-btn px-3 py-1 rounded-full text-xs font-medium bg-surface-variant/50 text-on-surface-variant hover:text-on-surface border border-transparent transition-colors">Expenses</button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-on-surface-variant uppercase tracking-wider border-b border-white/5">
+                                    <th class="px-6 py-4 font-medium">Description</th>
+                                    <th class="px-6 py-4 font-medium">Date</th>
+                                    <th class="px-6 py-4 font-medium">Category</th>
+                                    <th class="px-6 py-4 font-medium">Status</th>
+                                    <th class="px-6 py-4 font-medium text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTableBody" class="divide-y divide-white/5">
+                                <!-- Transactions injected here by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
+
+    <!-- Load Dashboard Logic -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
