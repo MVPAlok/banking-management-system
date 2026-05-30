@@ -9,6 +9,7 @@ const Store = {
     USER_KEY: 'bms_user',
     TRANSACTIONS_KEY: 'bms_transactions',
     ACCOUNTS_KEY: 'bms_accounts',
+    CARDS_KEY: 'bms_cards',
 
     // Initial dummy data
     initData: {
@@ -107,10 +108,86 @@ const Store = {
         return localStorage.getItem('bms_auth') === 'true';
     },
 
+    updateUser(user) {
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    },
+
+    addAccount(account) {
+        const accounts = this.getAccounts();
+        const newAcc = {
+            id: 'acc' + Date.now(),
+            number: '**** ' + Math.floor(1000 + Math.random() * 9000),
+            balance: parseFloat(account.balance) || 0,
+            currency: 'USD',
+            ...account
+        };
+        accounts.push(newAcc);
+        localStorage.setItem(this.ACCOUNTS_KEY, JSON.stringify(accounts));
+
+        // Add Initial Deposit transaction if there is a positive balance
+        if (newAcc.balance > 0) {
+            this.addTransaction({
+                type: 'credit',
+                amount: newAcc.balance,
+                desc: `Initial Deposit - ${newAcc.name}`,
+                accountId: newAcc.id,
+                category: 'Income'
+            });
+        }
+        return newAcc;
+    },
+
+    getCards() {
+        if (!localStorage.getItem(this.CARDS_KEY)) {
+            const initCards = [
+                {
+                    id: 'card1',
+                    type: 'VISA',
+                    name: 'Premium Checking',
+                    number: '4532 9901 8821 7761',
+                    holder: this.getUser().name.toUpperCase(),
+                    expires: '08/29',
+                    locked: false,
+                    intlEnabled: true
+                }
+            ];
+            localStorage.setItem(this.CARDS_KEY, JSON.stringify(initCards));
+        }
+        return JSON.parse(localStorage.getItem(this.CARDS_KEY)) || [];
+    },
+
+    addCard(card) {
+        const cards = this.getCards();
+        const newCard = {
+            id: 'card' + Date.now(),
+            number: '4532 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000),
+            holder: this.getUser().name.toUpperCase(),
+            expires: '12/30',
+            locked: false,
+            intlEnabled: false,
+            ...card
+        };
+        cards.push(newCard);
+        localStorage.setItem(this.CARDS_KEY, JSON.stringify(cards));
+        return newCard;
+    },
+
+    updateCard(cardId, updates) {
+        const cards = this.getCards();
+        const index = cards.findIndex(c => c.id === cardId);
+        if (index !== -1) {
+            cards[index] = { ...cards[index], ...updates };
+            localStorage.setItem(this.CARDS_KEY, JSON.stringify(cards));
+            return cards[index];
+        }
+        return null;
+    },
+
     resetData() {
         localStorage.removeItem(this.USER_KEY);
         localStorage.removeItem(this.ACCOUNTS_KEY);
         localStorage.removeItem(this.TRANSACTIONS_KEY);
+        localStorage.removeItem(this.CARDS_KEY);
         localStorage.removeItem('bms_auth');
         this.init();
     }
